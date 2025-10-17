@@ -1,4 +1,5 @@
-﻿namespace EVO_Backend.Models
+﻿// Models/TypingScore.cs
+namespace EVO_Backend.Models
 {
     public class TypingScore
     {

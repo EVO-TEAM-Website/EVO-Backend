@@ -61,20 +61,4 @@ public class ProfileController : ControllerBase
 
         return Ok(new { message = "Profile updated." });
     }
-
-    // PUT /api/profile/change-password
-    [HttpPut("change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
-    {
-        if (dto.NewPassword != dto.ConfirmNewPassword)
-            return BadRequest("New passwords do not match.");
-
-        var user = await _userManager.GetUserAsync(User);
-        if (user is null) return Unauthorized();
-
-        var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
-        if (!result.Succeeded) return BadRequest(result.Errors);
-
-        return Ok(new { message = "Password changed." });
-    }
 }

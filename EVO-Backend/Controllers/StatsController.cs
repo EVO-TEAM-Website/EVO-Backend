@@ -1,6 +1,7 @@
 ﻿using EVO_Backend.Data;
+using EVO_Backend.Models; // مكان ApplicationUser إن وجد
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EVO_Backend.Controllers;
 
@@ -8,20 +9,29 @@ namespace EVO_Backend.Controllers;
 [Route("api/[controller]")]
 public class StatsController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
-    public StatsController(ApplicationDbContext db) => _db = db;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public StatsController(UserManager<ApplicationUser> userManager)
+        => _userManager = userManager;
 
     // GET /api/stats
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        // عدد الطلاب المؤكدين فقط
-        var totalStudents = await (from u in _db.Users
-                                   join ur in _db.UserRoles on u.Id equals ur.UserId
-                                   join r in _db.Roles on ur.RoleId equals r.Id
-                                   where r.Name == "Student" && u.EmailConfirmed
-                                   select u.Id).Distinct().CountAsync();
+        try
+        {
+            // كل المستخدمين في Role "Student"
+            var students = await _userManager.GetUsersInRoleAsync("Student");
 
-        return Ok(new { totalStudents });
+            // فقط المؤكدين
+            var totalStudents = students.Count(u => u.EmailConfirmed);
+
+            return Ok(new { totalStudents });
+        }
+        catch (Exception ex)
+        {
+            // رجّع رسالة مفيدة بدل 500 صامتة
+            return StatusCode(500, new { error = "stats_failed", message = ex.Message });
+        }
     }
 }

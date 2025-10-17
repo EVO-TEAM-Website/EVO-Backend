@@ -1,4 +1,5 @@
-﻿namespace EVO_Backend.Dtos.Typing
+﻿// DTOs/TypingDtos.cs
+namespace EVO_Backend.Dtos.Typing
 {
     public class SubmitScoreDto
     {
