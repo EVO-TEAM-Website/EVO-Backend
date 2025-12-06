@@ -52,7 +52,14 @@ public class AuthController : ControllerBase
             ev.LastSentAtUtc = now;
             await _db.SaveChangesAsync();
 
-            await _email.SendAsync(existing.Email!, "Verify your email", $"<p>Your code is <b>{code}</b></p>");
+            try
+            {
+                await _email.SendAsync(existing.Email!, "Verify your email", $"<p>Your code is <b>{code}</b></p>");
+
+            } catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
             return Ok(new { message = "User exists but not verified. New code sent." });
         }
 
